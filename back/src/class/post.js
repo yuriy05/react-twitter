@@ -17,9 +17,13 @@ class Post {
 
         if (post) {
             post.reply.push(newPost)
+
+            console.log(post)
         } else {
             this.#list.push(newPost)
         }
+
+        console.log(this.#list)
 
         return newPost
     }
