@@ -1,10 +1,14 @@
 import { useState, Fragment } from "react";
 
-import {Alert, Loader, LOAD_STATUS} from "../../component/load";
+import {Alert, Skeleton, LOAD_STATUS} from "../../component/load";
 
 import Box from "../../component/box";
 
+import Grid from "../../component/grid"
+
 import PostContent from "../../component/post-content"
+
+import PostCreate from "../post-create"
 
 import { getDate } from "../../util/getDate"
 
@@ -52,7 +56,7 @@ export default function Container({ id, username, text, date }) {
             id,
             text,
             username,
-            date,
+            date: getDate(date),
         })),
 
         isEmpty: post.reply.length === 0,
@@ -68,14 +72,8 @@ export default function Container({ id, username, text, date }) {
     };
 
     return (
-        <Box style={{ padding: "0"}}>
-            <div
-                style={{
-                    padding: "20px",
-                    cursor: "pointer",
-                }}
-                onClick={handleOpen}
-            >
+        <Box style={{ padding: "0" }}>
+            <div style={{padding: "20px",cursor: "pointer"}} onClick={handleOpen}>
             <PostContent 
                 username={data.username}
                 date={data.date}

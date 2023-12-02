@@ -2,6 +2,9 @@ import "./index.css"
 
 import Grid from "../grid";
 
+import { getDate } from "../../util/getDate"
+
+
 export default function Component({ username, date, text}) {
     return (
         <Grid>

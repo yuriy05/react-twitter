@@ -10,7 +10,7 @@ import { Alert, Skeleton, LOAD_STATUS} from "../../component/load";
 
 import { getDate } from "../../util/getDate";
 
-import PostItem from "../../component/post-content"
+import PostItem from "../post-item"
 
 export default function Container() {
     const [status, setStatus] = useState(null);
