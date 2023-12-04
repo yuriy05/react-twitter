@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 
 import Title from "../../component/title";
 import Grid from "../../component/grid";
@@ -9,6 +9,7 @@ import PostCreate from "../post-create";
 import { Alert, Skeleton, LOAD_STATUS} from "../../component/load";
 
 import { getDate } from "../../util/getDate";
+
 
 import PostItem from "../post-item"
 
@@ -51,9 +52,13 @@ export default function Container() {
         isEmpty: raw.list.length === 0,
     });
 
-    if (status === null) {
+    useEffect(() => {
         getData();
-    }
+
+        const intervalId = setInterval(() => getData(), 10000);
+
+        return () => clearInterval(intervalId)
+    },[]);
 
     return(
         <Grid>

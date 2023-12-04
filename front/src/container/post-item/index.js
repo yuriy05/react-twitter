@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 
 import {Alert, Skeleton, LOAD_STATUS} from "../../component/load";
 
@@ -65,11 +65,14 @@ export default function Container({ id, username, text, date }) {
     const [isOpen, setOpen] = useState(false);
 
     const handleOpen = () => {
-        if( status === null) {
-            getData();
-        }
         setOpen(!isOpen);
     };
+
+    useEffect(() => {
+        if (isOpen === true) {
+            getData();
+        }
+    }, [isOpen])
 
     return (
         <Box style={{ padding: "0" }}>
