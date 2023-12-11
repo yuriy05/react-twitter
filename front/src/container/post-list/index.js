@@ -1,26 +1,29 @@
-import { useState, Fragment, useEffect } from "react";
+import { useState, Fragment, useEffect, useReducer } from "react";
 
 import Title from "../../component/title";
 import Grid from "../../component/grid";
 import Box from "../../component/box";
 
-
+import PostItem from "../post-item"
 import PostCreate from "../post-create";
+
 import { Alert, Skeleton, LOAD_STATUS} from "../../component/load";
 
 import { getDate } from "../../util/getDate";
+import {
+    requestInitialState,
+    requestReducer,
+    REQUEST_ACTION_TYPE,
+} from "../../util/request";
 
 
-import PostItem from "../post-item"
 
 export default function Container() {
-    const [status, setStatus] = useState(null);
-    const [message, setMessage] = useState("");
-    const [data, setData] = useState(null);
+   const [state, dispatch] = useReducer(requestReducer, requestInitialState)
 
 
     const getData = async () => {
-        setStatus(LOAD_STATUS.PROGRESS);
+        dispatch({type: REQUEST_ACTION_TYPE.PROGRESS})
         try {
             const res = await fetch("http://localhost:4000/post-list", {
                 method: "GET",
@@ -29,18 +32,23 @@ export default function Container() {
             const data = await res.json();
 
             if (res.ok) {
-                setData(convertData(data));
-                setStatus(LOAD_STATUS.SUCCESS);
+                dispatch({
+                    type: REQUEST_ACTION_TYPE.SUCCESS,
+                    payload: convertData(data),
+                })
             } else {
-                setMessage(data.message);
-                setStatus(LOAD_STATUS.ERROR);
+                dispatch({
+                    type: REQUEST_ACTION_TYPE.ERROR,
+                    payload: data.message,
+                })
             }
         } catch(error) {
-            setMessage(error.message);
-            setStatus(LOAD_STATUS.ERROR)
+            dispatch({
+                type: REQUEST_ACTION_TYPE.ERROR,
+                payload: error.message,
+            })
         }
     };
-
     const convertData = (raw) => ({
         list: raw.list.reverse().map(({ id, username, text, date}) => ({
             id,
@@ -53,12 +61,8 @@ export default function Container() {
     });
 
     useEffect(() => {
-        getData();
-
-        const intervalId = setInterval(() => getData(), 10000);
-
-        return () => clearInterval(intervalId)
-    },[]);
+        getData()
+    }, []);
 
     return(
         <Grid>
@@ -73,7 +77,7 @@ export default function Container() {
                 </Grid>
             </Box>
 
-            {status === LOAD_STATUS.PROGRESS && (
+            {state.status === REQUEST_ACTION_TYPE.PORGRESS && (
                 <Fragment>
                     <Box>
                         <Skeleton />
@@ -84,16 +88,16 @@ export default function Container() {
                 </Fragment>
             )}
 
-            {status === LOAD_STATUS.ERROR && (
-                <Alert status={status} message={message} />
+            {state.status === REQUEST_ACTION_TYPE.ERROR && (
+                <Alert status={state.status} message={state.message} />
             )}
 
-            {status === LOAD_STATUS.SUCCESS && (
+            {state.status === REQUEST_ACTION_TYPE.SUCCESS && (
                 <Fragment>
-                    {data.isEmpty ? (
+                    {state.data.isEmpty ? (
                         <Alert message="Список постів пустий" />
                     ) : (
-                        data.list.map((item) => (
+                        state.data.list.map((item) => (
                             <Fragment key={item.id}>
                                 <PostItem  {...item} />
                             </Fragment>
