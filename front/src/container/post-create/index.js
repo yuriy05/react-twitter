@@ -1,11 +1,11 @@
-import { useState, useReducer } from "react";
+import { useReducer, memo, useCallback } from "react";
 
 import "./index.css";
 
 import FieldForm from "../../component/field-form";
 import Grid from "../../component/grid";
 
-import {Alert, Loader, LOAD_STATUS} from "../../component/load";
+import {Alert, Loader} from "../../component/load";
 
 import {
     requestInitialState,
@@ -13,14 +13,17 @@ import {
     REQUEST_ACTION_TYPE,
 } from "../../util/request";
 
-export default function Container({ onCreate, placeholder, button, id = null}) {
+function Container({ onCreate, placeholder, button, id = null}) {
     const [state, dispatch] = useReducer(requestReducer, requestInitialState)
     
-    const handleSubmit = (value) => {
-        return sendData({ value });
-    }
+    const convertData = useCallback(({ value }) =>
+    JSON.stringify({
+        text: value,
+        username: "user",
+        postId: id,
+    }), [id]);
 
-    const sendData = async (dataToSend) => {
+    const sendData = useCallback(async (dataToSend) => {
         dispatch({type: REQUEST_ACTION_TYPE.PROGRESS});
 
         try {
@@ -45,14 +48,11 @@ export default function Container({ onCreate, placeholder, button, id = null}) {
         } catch(error) {
             dispatch({type: REQUEST_ACTION_TYPE.ERROR, message: error.message});
         }
-    };
+    }, [convertData, onCreate]);
 
-    const convertData = ({ value }) =>
-        JSON.stringify({
-            text: value,
-            username: "user",
-            postId: id,
-        });
+    const handleSubmit = useCallback((value) => {
+        return sendData({ value });
+    }, [sendData])
 
     return(
         <Grid>
@@ -64,7 +64,11 @@ export default function Container({ onCreate, placeholder, button, id = null}) {
             {state.status === REQUEST_ACTION_TYPE.ERROR &&  (
                 <Alert status={state.status} message={state.message} />
             )}
-            {state.status === REQUEST_ACTION_TYPE.PORGRESS && <Loader/>}
+            {state.status === REQUEST_ACTION_TYPE.PROGRESS && <Loader/>}
         </Grid>
     );
 } 
+
+export default memo(Container, (prev, next) => {
+    return true;
+})

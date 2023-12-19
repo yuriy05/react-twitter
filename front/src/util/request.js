@@ -1,5 +1,5 @@
 export const REQUEST_ACTION_TYPE = {
-    PORGRESS: "porgress",
+    PROGRESS: "progress",
     SUCCESS: "success",
     ERROR: "error",
     RESET: "reset",
@@ -13,7 +13,7 @@ export const requestInitialState = {
 
 export const requestReducer = (state, action) => {
     switch (action.type) {
-        case REQUEST_ACTION_TYPE.PORGRESS:
+        case REQUEST_ACTION_TYPE.PROGRESS:
             return {
                 ...state,
                 status: action.type,

@@ -1,12 +1,10 @@
-import { useState, Fragment, useEffect, useReducer } from "react";
+import { useState, Fragment, useEffect, useReducer, useCallback, Suspense, lazy } from "react";
 
-import {Alert, Skeleton, LOAD_STATUS} from "../../component/load";
+import { Alert, Skeleton } from "../../component/load";
 
 import Box from "../../component/box";
 
 import Grid from "../../component/grid"
-
-import PostContent from "../../component/post-content"
 
 import PostCreate from "../post-create"
 
@@ -18,6 +16,8 @@ import {
     REQUEST_ACTION_TYPE,
 } from "../../util/request";
 
+const PostContent = lazy(() => import("../../component/post-content"))
+
 export default function Container({ id, username, text, date }) {
 
     const [state, dispatch] = useReducer(requestReducer, requestInitialState, (state) => ({...state, data:{
@@ -28,7 +28,7 @@ export default function Container({ id, username, text, date }) {
         reply: null,
     }}))
         
-    const getData = async () => {
+    const getData = useCallback(async () => {
         dispatch({type: REQUEST_ACTION_TYPE.PROGRESS})
 
         try {
@@ -54,7 +54,7 @@ export default function Container({ id, username, text, date }) {
                 payload: error.message,
             })
         }
-    };
+    }, [state.data.id]);
 
     const convertData = ({ post }) => ({
         id: post.id,
@@ -106,7 +106,7 @@ export default function Container({ id, username, text, date }) {
                             />
                         </Box>
 
-                        {state.status === REQUEST_ACTION_TYPE.PORGRESS && (
+                        {state.status === REQUEST_ACTION_TYPE.PROGRESS && (
                             <Fragment>
                                 <Box>
                                 <Skeleton/>
@@ -124,10 +124,18 @@ export default function Container({ id, username, text, date }) {
                         {state.status === REQUEST_ACTION_TYPE.SUCCESS && 
                             state.data.isEmpty === false &&
                             state.data.reply.map((item) => (
-                                <Fragment>
-                                    <Box>
-                                        <PostContent {...item} />
-                                    </Box>
+                                <Fragment key={item.id}>
+                                    <Suspense fallback =
+                                        {
+                                            <Box>
+                                                <Skeleton />
+                                            </Box>
+                                        }
+                                    >
+                                        <Box>
+                                            <PostContent {...item} />
+                                        </Box>
+                                    </Suspense>
                                 </Fragment>
                             ))}
                     </Grid>
