@@ -23,7 +23,7 @@ textarea {
 .field-form__button {
     color: #fff;
     background-color: #0050ff;
-    padding: 10px 16px;
+    padding: 10px 15px;
     border-radius: 24px;
 
     transition: opacity 0.4s;
