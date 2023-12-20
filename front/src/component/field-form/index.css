@@ -1,6 +1,23 @@
+@keyframes caret {
+    0%,
+    50%,
+    100% {
+        opacity: 1;
+    }
+
+    25%,
+    75% {
+        opacity: 0;
+    }
+}
+
 .field-form {
     display: flex;
     align-items: center;
+}
+
+textarea {
+    animation: caret 2s ease 0s 1 normal forwards;
 }
 
 .field-form__button {
